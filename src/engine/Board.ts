@@ -1,0 +1,99 @@
+import type { Block } from "./Block";
+import { Position } from "./Position";
+import { Direction, type Size } from "./Types";
+
+export class Board {
+  blocks: Block[];
+  exitPosition: Position;
+  size: Size;
+
+  private static readonly DEFAULT_SIZE: Size = { width: 4, height: 5 };
+  private static readonly DEFAULT_EXIT_POSITION: Position = new Position(1, 3);
+
+  constructor() {
+    this.blocks = [];
+    this.exitPosition = Board.DEFAULT_EXIT_POSITION;
+    this.size = Board.DEFAULT_SIZE;
+  }
+
+  private isValidPosition(block: Block): boolean {
+    if (
+      block.position.x < 0 ||
+      block.position.y < 0 ||
+      block.position.x + block.size.width > this.size.width ||
+      block.position.y + block.size.height > this.size.height
+    ) {
+      return false; // Block is out of bounds
+    }
+
+    for (const existingBlock of this.blocks) {
+      if (existingBlock.id === block.id) {
+        continue; // Skip collision check with itself
+      }
+
+      if (
+        existingBlock.position.x < block.position.x + block.size.width &&
+        existingBlock.position.x + existingBlock.size.width >
+          block.position.x &&
+        existingBlock.position.y < block.position.y + block.size.height &&
+        existingBlock.position.y + existingBlock.size.height > block.position.y
+      ) {
+        return false; // Collision detected with existing block
+      }
+    }
+
+    return true;
+  }
+
+  addBlock(block: Block): boolean {
+    if (!this.isValidPosition(block)) return false;
+
+    this.blocks.push(block);
+    return true;
+  }
+
+  getBlockByPosition(position: Position): Block | null {
+    return (
+      this.blocks.find(
+        (block) =>
+          position.x >= block.position.x &&
+          position.x < block.position.x + block.size.width &&
+          position.y >= block.position.y &&
+          position.y < block.position.y + block.size.height
+      ) || null
+    );
+  }
+
+  private getBlockById(id: string): Block | null {
+    return this.blocks.find((block) => block.id === id) || null;
+  }
+
+  move(blockId: string, direction: Direction): boolean {
+    const block = this.getBlockById(blockId);
+    if (!block) return false;
+
+    const newPosition = new Position(block.position.x, block.position.y);
+
+    switch (direction) {
+      case Direction.UP:
+        newPosition.y -= 1;
+        break;
+      case Direction.DOWN:
+        newPosition.y += 1;
+        break;
+      case Direction.LEFT:
+        newPosition.x -= 1;
+        break;
+      case Direction.RIGHT:
+        newPosition.x += 1;
+        break;
+    }
+
+    if (!this.isValidPosition({ ...block, position: newPosition })) {
+      return false;
+    }
+
+    block.position = newPosition;
+    return true;
+  }
+}
