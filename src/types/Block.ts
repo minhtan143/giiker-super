@@ -1,5 +1,5 @@
+import { BlockType, type Size } from "./Common";
 import { Position } from "./Position";
-import { BlockType, type Size } from "./Types";
 
 export class Block {
   id: string = crypto.randomUUID();

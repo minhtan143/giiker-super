@@ -1,4 +1,4 @@
-import type { Direction, GameMode, History } from "./Types";
+import type { Direction, GameMode, History } from "./Common";
 
 export class GameState {
   moveCount: number;

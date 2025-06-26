@@ -1,5 +1,5 @@
 import React from "react";
-import { GameMode } from "../engine/Types";
+import { GameMode } from "../types/Common";
 
 interface ControlPanelProps {
   moveCount: number;

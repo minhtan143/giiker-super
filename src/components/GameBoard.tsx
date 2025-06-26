@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import type { Block } from "../engine/Block";
-import type { Board } from "../engine/Board";
-import { Position } from "../engine/Position";
-import { BlockType, Direction, type Size } from "../engine/Types";
+import type { Block } from "../types/Block";
+import type { Board } from "../types/Board";
+import { BlockType, Direction, type Size } from "../types/Common";
+import { Position } from "../types/Position";
 import "./GameBoard.css";
 
 const GRID_SIZE = 80; // Size of each grid cell in pixels

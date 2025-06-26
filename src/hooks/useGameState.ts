@@ -1,8 +1,8 @@
 import { useCallback, useState } from "react";
-import { Board } from "../engine/Board";
-import { GameState } from "../engine/GameState";
-import { Direction, GameMode } from "../engine/Types";
-import { PuzzleEngine } from "../utils/PuzzleEngine";
+import { PuzzleEngine } from "../engine/PuzzleEngine";
+import { Board } from "../types/Board";
+import { Direction, GameMode } from "../types/Common";
+import { GameState } from "../types/GameState";
 
 export function useGameState() {
   const [gameState, setGameState] = useState<GameState>(

@@ -1,6 +1,6 @@
 import type { Block } from "./Block";
+import { Direction, type Size } from "./Common";
 import { Position } from "./Position";
-import { Direction, type Size } from "./Types";
 
 export class Board {
   blocks: Block[];

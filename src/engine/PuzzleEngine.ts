@@ -1,7 +1,7 @@
-import { Block } from "../engine/Block";
-import { Board } from "../engine/Board";
-import { Position } from "../engine/Position";
-import { BlockType } from "../engine/Types";
+import { Block } from "../types/Block";
+import { Board } from "../types/Board";
+import { BlockType } from "../types/Common";
+import { Position } from "../types/Position";
 
 export class PuzzleEngine {
   constructor() {}
