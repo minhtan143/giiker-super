@@ -1,19 +1,17 @@
 import React from "react";
-import { GameMode } from "../types/Common";
+import type { GameState } from "../types/GameState";
 
 interface ControlPanelProps {
-  moveCount: number;
-  isWin: boolean;
-  gameMode: GameMode;
+  gameState: GameState;
 }
 
-const ControlPanel: React.FC<ControlPanelProps> = ({ moveCount, isWin }) => {
+const ControlPanel: React.FC<ControlPanelProps> = ({ gameState }) => {
   return (
     <div className="control-panel">
       <div className="level-info">
         <h2>Super Slide</h2>
-        <p>Moves: {moveCount}</p>
-        {isWin && <p className="win-message">Solved! 🎉</p>}
+        <p>Moves: {gameState.moveCount}</p>
+        {gameState.isWin && <p className="win-message">Solved! 🎉</p>}
       </div>
 
       {/* <div className="controls">

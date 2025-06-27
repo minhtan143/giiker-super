@@ -17,13 +17,28 @@ export function useGameState() {
 
       const moved = board.move(blockId, direction);
       if (moved) {
-        gameState.addMove(blockId, direction);
-        setGameState(gameState);
-        setBoard(board);
+        const newGameState = new GameState(gameState.gameMode);
+        newGameState.moveCount = gameState.moveCount + 1;
+        newGameState.startTime = gameState.startTime;
+        newGameState.history = [
+          ...gameState.history,
+          { blockId, moveDirection: direction },
+        ];
+
+        newGameState.isWin = gameState.isWin;
+
+        setGameState(newGameState);
+
+        const boardCopy = new Board();
+        boardCopy.blocks = [...board.blocks];
+        boardCopy.exitPosition = board.exitPosition;
+        boardCopy.size = board.size;
+        setBoard(boardCopy);
       }
+
       return moved;
     },
-    [board, gameState]
+    [gameState, board]
   );
 
   //   // Undo the last move

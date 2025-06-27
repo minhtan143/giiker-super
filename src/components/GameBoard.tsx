@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { Block } from "../types/Block";
 import type { Board } from "../types/Board";
 import { BlockType, Direction, type Size } from "../types/Common";
+import type { GameState } from "../types/GameState";
 import { Position } from "../types/Position";
 import "./GameBoard.css";
 
@@ -15,12 +16,16 @@ const COLORS = {
 };
 
 interface GameBoardProps {
+  gameState: GameState;
   board: Board;
   onMoveBlock: (blockId: string, direction: Direction) => boolean;
-  isWin: boolean;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({ board, onMoveBlock, isWin }) => {
+const GameBoard: React.FC<GameBoardProps> = ({
+  gameState,
+  board,
+  onMoveBlock,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const BLOCK_MARGIN = 2;
 
@@ -68,11 +73,11 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, onMoveBlock, isWin }) => {
     const exitY = board.exitPosition.y * GRID_SIZE;
 
     // Exit zone background
-    ctx.fillStyle = isWin ? "#4CAF50" : "#ECEFF1";
+    ctx.fillStyle = gameState.isWin ? "#4CAF50" : "#ECEFF1";
     ctx.fillRect(exitX, exitY, GRID_SIZE, GRID_SIZE);
 
     // LED indicator border
-    ctx.strokeStyle = isWin ? "#388E3C" : "#B0BEC5";
+    ctx.strokeStyle = gameState.isWin ? "#388E3C" : "#B0BEC5";
     ctx.lineWidth = 3;
     ctx.strokeRect(exitX + 5, exitY + 5, GRID_SIZE - 10, GRID_SIZE - 10);
 
@@ -128,7 +133,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, onMoveBlock, isWin }) => {
     });
 
     // Win animation - only if game is won
-    if (isWin) {
+    if (gameState.isWin) {
       const targetBlock = board.blocks.find(
         (block) => block.position === board.exitPosition
       );
@@ -150,10 +155,10 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, onMoveBlock, isWin }) => {
         ctx.fill();
       }
     }
-  }, [board, onMoveBlock, isWin, CANVAS_SIZE]);
+  }, [board, gameState.moveCount, CANVAS_SIZE, gameState.isWin]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (isWin || !canvasRef.current) return;
+    if (gameState.isWin || !canvasRef.current) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
@@ -175,23 +180,30 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, onMoveBlock, isWin }) => {
     }
   };
 
-  const handleMouseUp = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (isWin || !canvasRef.current) return;
+  useEffect(() => {
+    const handleGlobalMouseUp = (e: MouseEvent) => {
+      if (gameState.isWin || !canvasRef.current) return;
 
-    if (!clickedLocation || !selectedBlock) return;
+      if (!clickedLocation || !selectedBlock) return;
 
-    const rect = canvasRef.current.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+      const rect = canvasRef.current.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
 
-    const dx = mouseX - clickedLocation.x;
-    const dy = mouseY - clickedLocation.y;
+      const dx = mouseX - clickedLocation.x;
+      const dy = mouseY - clickedLocation.y;
 
-    onMoveBlock(selectedBlock.id, getDirection(dx, dy));
+      onMoveBlock(selectedBlock.id, getDirection(dx, dy));
 
-    setClickedLocation(null);
-    setSelectedBlock(null);
-  };
+      setClickedLocation(null);
+      setSelectedBlock(null);
+    };
+
+    window.addEventListener("mouseup", handleGlobalMouseUp);
+    return () => {
+      window.removeEventListener("mouseup", handleGlobalMouseUp);
+    };
+  }, [clickedLocation, selectedBlock, gameState.isWin, onMoveBlock]);
 
   return (
     <div className="game-board-container">
@@ -201,7 +213,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ board, onMoveBlock, isWin }) => {
           width={CANVAS_SIZE.width}
           height={CANVAS_SIZE.height}
           onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
           className="game-canvas"
         />
       </div>

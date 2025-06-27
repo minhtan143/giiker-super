@@ -10,15 +10,11 @@ function App() {
     <div className="app">
       <div className="game-container">
         <GameBoard
+          gameState={gameState}
           board={board}
           onMoveBlock={onMoveBlock}
-          isWin={gameState.isWin}
         />
-        <ControlPanel
-          moveCount={gameState.moveCount}
-          isWin={gameState.isWin}
-          gameMode={gameState.gameMode}
-        />
+        <ControlPanel gameState={gameState} />
       </div>
       <footer>
         <p>Giiker Super Slide Web Implementation</p>
