@@ -34,7 +34,7 @@ export class PuzzleEngine {
         { blockId, moveDirection: direction },
       ];
 
-      newGameState.isWin = gameState.isWin;
+      newGameState.isWin = this.isGameWon(newGameState.board);
       gameState = newGameState;
     }
 
@@ -61,6 +61,16 @@ export class PuzzleEngine {
 
   resetLevel(): GameState {
     return new GameState(GameMode.NORMAL, this.initializeLevel());
+  }
+
+  private isGameWon(board: Board): boolean {
+    const bigSquare = board.blocks.find(
+      (block) =>
+        block.type === BlockType.BIG_SQUARE &&
+        block.position.x === board.exitPosition.x &&
+        block.position.y === board.exitPosition.y
+    );
+    return !!bigSquare;
   }
 
   private getReversedDirection(direction: Direction): Direction {

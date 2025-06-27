@@ -42,14 +42,26 @@ export default function drawBoard(
   const exitX = gameState.board.exitPosition.x * GRID_SIZE;
   const exitY = gameState.board.exitPosition.y * GRID_SIZE;
 
-  // Exit zone background
-  ctx.fillStyle = gameState.isWin ? "#4CAF50" : "#ECEFF1";
-  ctx.fillRect(exitX, exitY, GRID_SIZE, GRID_SIZE);
+  // Exit zone background - now 2x2 to match BIG_SQUARE size
+  ctx.fillStyle = gameState.isWin ? "#4CAF50" : "#F5CECE";
+  ctx.fillRect(exitX, exitY, GRID_SIZE * 2, GRID_SIZE * 2);
 
-  // LED indicator border
+  // Draw diagonal lines in exit zone
+  ctx.beginPath();
+  ctx.strokeStyle = gameState.isWin ? "#388E3C" : "#B0BEC5";
+  ctx.lineWidth = 2;
+  // First diagonal (top-left to bottom-right)
+  ctx.moveTo(exitX + 5, exitY + 5);
+  ctx.lineTo(exitX + GRID_SIZE * 2 - 5, exitY + GRID_SIZE * 2 - 5);
+  // Second diagonal (top-right to bottom-left)
+  ctx.moveTo(exitX + GRID_SIZE * 2 - 5, exitY + 5);
+  ctx.lineTo(exitX + 5, exitY + GRID_SIZE * 2 - 5);
+  ctx.stroke();
+
+  // LED indicator border - also 2x2 now
   ctx.strokeStyle = gameState.isWin ? "#388E3C" : "#B0BEC5";
   ctx.lineWidth = 3;
-  ctx.strokeRect(exitX + 5, exitY + 5, GRID_SIZE - 10, GRID_SIZE - 10);
+  ctx.strokeRect(exitX + 5, exitY + 5, GRID_SIZE * 2 - 10, GRID_SIZE * 2 - 10);
 
   // Draw blocks
   gameState.board.blocks.forEach((block) => {
@@ -105,7 +117,10 @@ export default function drawBoard(
   // Win animation - only if game is won
   if (gameState.isWin) {
     const targetBlock = gameState.board.blocks.find(
-      (block) => block.position === gameState.board.exitPosition
+      (block) =>
+        block.type === BlockType.BIG_SQUARE &&
+        block.position.x === gameState.board.exitPosition.x &&
+        block.position.y === gameState.board.exitPosition.y
     );
     if (targetBlock) {
       const { x, y } = targetBlock.position;

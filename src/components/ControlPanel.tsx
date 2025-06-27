@@ -1,5 +1,6 @@
 import React from "react";
 import type { GameState } from "../types/GameState";
+import "./ControlPanel.css";
 
 interface ControlPanelProps {
   gameState: GameState;
@@ -22,7 +23,10 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
 
       <div className="controls">
         <button onClick={onResetLevel}>Reset</button>
-        <button onClick={onUndoMove} disabled={gameState.moveCount === 0}>
+        <button
+          onClick={onUndoMove}
+          disabled={gameState.isWin || gameState.moveCount === 0}
+        >
           Undo
         </button>
       </div>
