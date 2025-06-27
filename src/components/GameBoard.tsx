@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { Block } from "../types/Block";
-import type { Board } from "../types/Board";
 import { BlockType, Direction, type Size } from "../types/Common";
 import type { GameState } from "../types/GameState";
 import { Position } from "../types/Position";
@@ -17,15 +16,10 @@ const COLORS = {
 
 interface GameBoardProps {
   gameState: GameState;
-  board: Board;
   onMoveBlock: (blockId: string, direction: Direction) => boolean;
 }
 
-const GameBoard: React.FC<GameBoardProps> = ({
-  gameState,
-  board,
-  onMoveBlock,
-}) => {
+const GameBoard: React.FC<GameBoardProps> = ({ gameState, onMoveBlock }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const BLOCK_MARGIN = 2;
 
@@ -34,10 +28,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
   const CANVAS_SIZE: Size = useMemo(
     () => ({
-      width: GRID_SIZE * board.size.width,
-      height: GRID_SIZE * board.size.height,
+      width: GRID_SIZE * gameState.board.size.width,
+      height: GRID_SIZE * gameState.board.size.height,
     }),
-    [board.size.width, board.size.height]
+    [gameState.board.size.width, gameState.board.size.height]
   );
 
   useEffect(() => {
@@ -54,7 +48,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
     ctx.strokeStyle = "#546E7A";
     ctx.lineWidth = 1;
-    for (let i = 0; i <= board.size.width; i++) {
+    for (let i = 0; i <= gameState.board.size.width; i++) {
       // Vertical lines
       ctx.beginPath();
       ctx.moveTo(i * GRID_SIZE, 0);
@@ -69,8 +63,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
     }
 
     // Draw exit zone with LED-style indicator
-    const exitX = board.exitPosition.x * GRID_SIZE;
-    const exitY = board.exitPosition.y * GRID_SIZE;
+    const exitX = gameState.board.exitPosition.x * GRID_SIZE;
+    const exitY = gameState.board.exitPosition.y * GRID_SIZE;
 
     // Exit zone background
     ctx.fillStyle = gameState.isWin ? "#4CAF50" : "#ECEFF1";
@@ -82,7 +76,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     ctx.strokeRect(exitX + 5, exitY + 5, GRID_SIZE - 10, GRID_SIZE - 10);
 
     // Draw blocks
-    board.blocks.forEach((block) => {
+    gameState.board.blocks.forEach((block) => {
       const { x, y } = block.position;
       const pixelX = x * GRID_SIZE;
       const pixelY = y * GRID_SIZE;
@@ -134,8 +128,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
     // Win animation - only if game is won
     if (gameState.isWin) {
-      const targetBlock = board.blocks.find(
-        (block) => block.position === board.exitPosition
+      const targetBlock = gameState.board.blocks.find(
+        (block) => block.position === gameState.board.exitPosition
       );
       if (targetBlock) {
         const { x, y } = targetBlock.position;
@@ -155,7 +149,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
         ctx.fill();
       }
     }
-  }, [board, gameState.moveCount, CANVAS_SIZE, gameState.isWin]);
+  }, [gameState, CANVAS_SIZE]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     if (gameState.isWin || !canvasRef.current) return;
@@ -168,7 +162,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
     const gridX = Math.floor(mouseX / GRID_SIZE);
     const gridY = Math.floor(mouseY / GRID_SIZE);
 
-    const clickedBlock = board.getBlockByPosition(new Position(gridX, gridY));
+    const clickedBlock = gameState.board.getBlockByPosition(
+      new Position(gridX, gridY)
+    );
     setSelectedBlock(clickedBlock);
   };
 

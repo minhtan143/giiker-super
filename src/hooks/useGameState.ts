@@ -1,48 +1,43 @@
 import { useCallback, useState } from "react";
 import { PuzzleEngine } from "../engine/PuzzleEngine";
-import { Board } from "../types/Board";
-import { Direction, GameMode } from "../types/Common";
+import { Direction } from "../types/Common";
 import { GameState } from "../types/GameState";
 
 export function useGameState() {
-  const [gameState, setGameState] = useState<GameState>(
-    new GameState(GameMode.NORMAL)
-  );
   const [engine] = useState<PuzzleEngine>(new PuzzleEngine());
-  const [board, setBoard] = useState<Board>(engine.initializeLevel());
+  const [gameState, setGameState] = useState<GameState>(engine.resetLevel());
 
   const handleMoveBlock = useCallback(
     (blockId: string, direction: Direction) => {
       if (gameState.isWin) return false;
 
-      const newGameState = engine.move(gameState, board, blockId, direction);
+      const newGameState = engine.move(gameState, blockId, direction);
       if (!newGameState) return false;
 
       setGameState(newGameState);
       return true;
     },
-    [engine, gameState, board]
+    [engine, gameState]
   );
 
   const handleUndoMove = useCallback(() => {
     if (!engine || gameState.moveCount === 0) return false;
 
-    const { newGameState, newBoard } = engine.undoMove(gameState, board);
+    const newGameState = engine.undoMove(gameState);
     setGameState(newGameState);
-    setBoard(newBoard);
     return true;
-  }, [engine, gameState, board]);
+  }, [engine, gameState]);
 
   const handleResetLevel = useCallback(() => {
     if (!engine) return false;
 
-    const reset = engine.resetLevel();
-    return reset;
+    const gameState = engine.resetLevel();
+    setGameState(gameState);
+    return true;
   }, [engine]);
 
   return {
     gameState,
-    board,
     handleMoveBlock,
     handleResetLevel,
     handleUndoMove,

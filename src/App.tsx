@@ -4,22 +4,13 @@ import GameBoard from "./components/GameBoard";
 import { useGameState } from "./hooks/useGameState";
 
 function App() {
-  const {
-    gameState,
-    board,
-    handleMoveBlock,
-    handleResetLevel,
-    handleUndoMove,
-  } = useGameState();
+  const { gameState, handleMoveBlock, handleResetLevel, handleUndoMove } =
+    useGameState();
 
   return (
     <div className="app">
       <div className="game-container">
-        <GameBoard
-          gameState={gameState}
-          board={board}
-          onMoveBlock={handleMoveBlock}
-        />
+        <GameBoard gameState={gameState} onMoveBlock={handleMoveBlock} />
         <ControlPanel
           gameState={gameState}
           onResetLevel={handleResetLevel}
