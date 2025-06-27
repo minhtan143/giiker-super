@@ -4,7 +4,13 @@ import GameBoard from "./components/GameBoard";
 import { useGameState } from "./hooks/useGameState";
 
 function App() {
-  const { gameState, board, onMoveBlock } = useGameState();
+  const {
+    gameState,
+    board,
+    handleMoveBlock,
+    handleResetLevel,
+    handleUndoMove,
+  } = useGameState();
 
   return (
     <div className="app">
@@ -12,9 +18,13 @@ function App() {
         <GameBoard
           gameState={gameState}
           board={board}
-          onMoveBlock={onMoveBlock}
+          onMoveBlock={handleMoveBlock}
         />
-        <ControlPanel gameState={gameState} />
+        <ControlPanel
+          gameState={gameState}
+          onResetLevel={handleResetLevel}
+          onUndoMove={handleUndoMove}
+        />
       </div>
       <footer>
         <p>Giiker Super Slide Web Implementation</p>

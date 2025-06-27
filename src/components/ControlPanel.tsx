@@ -3,23 +3,29 @@ import type { GameState } from "../types/GameState";
 
 interface ControlPanelProps {
   gameState: GameState;
+  onResetLevel: () => void;
+  onUndoMove: () => void;
 }
 
-const ControlPanel: React.FC<ControlPanelProps> = ({ gameState }) => {
+const ControlPanel: React.FC<ControlPanelProps> = ({
+  gameState,
+  onResetLevel,
+  onUndoMove,
+}) => {
   return (
     <div className="control-panel">
       <div className="level-info">
-        <h2>Super Slide</h2>
+        <h2>Giiker Super Slide</h2>
         <p>Moves: {gameState.moveCount}</p>
         {gameState.isWin && <p className="win-message">Solved! 🎉</p>}
       </div>
 
-      {/* <div className="controls">
+      <div className="controls">
         <button onClick={onResetLevel}>Reset</button>
-        <button onClick={onUndoMove} disabled={moveCount === 0}>
+        <button onClick={onUndoMove} disabled={gameState.moveCount === 0}>
           Undo
         </button>
-      </div> */}
+      </div>
 
       {/* <div className="game-modes">
         <h3>Game Mode</h3>

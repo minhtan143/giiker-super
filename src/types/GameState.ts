@@ -1,4 +1,4 @@
-import type { Direction, GameMode, History } from "./Common";
+import type { GameMode, History } from "./Common";
 
 export class GameState {
   moveCount: number;
@@ -13,10 +13,5 @@ export class GameState {
     this.startTime = Date.now();
     this.history = [];
     this.isWin = false;
-  }
-
-  addMove(blockId: string, moveDirection: Direction) {
-    this.moveCount++;
-    this.history.push({ blockId, moveDirection });
   }
 }

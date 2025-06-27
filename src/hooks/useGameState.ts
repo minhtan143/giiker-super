@@ -11,47 +11,40 @@ export function useGameState() {
   const [engine] = useState<PuzzleEngine>(new PuzzleEngine());
   const [board, setBoard] = useState<Board>(engine.initializeLevel());
 
-  const onMoveBlock = useCallback(
+  const handleMoveBlock = useCallback(
     (blockId: string, direction: Direction) => {
       if (gameState.isWin) return false;
 
-      const moved = board.move(blockId, direction);
-      if (moved) {
-        const newGameState = new GameState(gameState.gameMode);
-        newGameState.moveCount = gameState.moveCount + 1;
-        newGameState.startTime = gameState.startTime;
-        newGameState.history = [
-          ...gameState.history,
-          { blockId, moveDirection: direction },
-        ];
+      const newGameState = engine.move(gameState, board, blockId, direction);
+      if (!newGameState) return false;
 
-        newGameState.isWin = gameState.isWin;
-
-        setGameState(newGameState);
-
-        const boardCopy = new Board();
-        boardCopy.blocks = [...board.blocks];
-        boardCopy.exitPosition = board.exitPosition;
-        boardCopy.size = board.size;
-        setBoard(boardCopy);
-      }
-
-      return moved;
+      setGameState(newGameState);
+      return true;
     },
-    [gameState, board]
+    [engine, gameState, board]
   );
 
-  //   // Undo the last move
-  //   const undoMove = useCallback(() => {
-  //     if (!engine || gameState.moves === 0) return false;
+  const handleUndoMove = useCallback(() => {
+    if (!engine || gameState.moveCount === 0) return false;
 
-  //     const undone = engine.undoMove();
-  //     return undone;
-  //   }, [engine, gameState.moves]);
+    const { newGameState, newBoard } = engine.undoMove(gameState, board);
+    setGameState(newGameState);
+    setBoard(newBoard);
+    return true;
+  }, [engine, gameState, board]);
+
+  const handleResetLevel = useCallback(() => {
+    if (!engine) return false;
+
+    const reset = engine.resetLevel();
+    return reset;
+  }, [engine]);
 
   return {
     gameState,
     board,
-    onMoveBlock,
+    handleMoveBlock,
+    handleResetLevel,
+    handleUndoMove,
   };
 }
