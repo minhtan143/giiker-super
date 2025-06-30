@@ -5,10 +5,10 @@ export const GRID_SIZE = 80;
 const BLOCK_MARGIN = 2;
 
 const COLORS = {
-  [BlockType.BIG_SQUARE]: "#FF5252", // Red for target block
-  [BlockType.SMALL_SQUARE]: "#4CAF50", // Green
-  [BlockType.HORIZONTAL_RECT]: "#2196F3", // Blue
-  [BlockType.VERTICAL_RECT]: "#FFC107", // Amber
+  [BlockType.BIG_SQUARE]: "#FF5252",
+  [BlockType.SMALL_SQUARE]: "#FFC107",
+  [BlockType.HORIZONTAL_RECT]: "#4CAF50",
+  [BlockType.VERTICAL_RECT]: "#2196F3",
 };
 
 export default function drawBoard(

@@ -1,40 +1,45 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { PuzzleEngine } from "../engine/PuzzleEngine";
-import { Direction } from "../types/Common";
+import { Board } from "../types/Board";
+import { Direction, GameMode } from "../types/Common";
 import { GameState } from "../types/GameState";
 
 export function useGameState() {
-  const [engine] = useState<PuzzleEngine>(new PuzzleEngine());
-  const [gameState, setGameState] = useState<GameState>(engine.resetLevel());
-
-  const handleMoveBlock = useCallback(
-    (blockId: string, direction: Direction) => {
-      if (gameState.isWin) return false;
-
-      const newGameState = engine.move(gameState, blockId, direction);
-      if (!newGameState) return false;
-
-      setGameState(newGameState);
-      return true;
-    },
-    [engine, gameState]
+  const [engine] = useState<PuzzleEngine>(() => new PuzzleEngine());
+  const [gameState, setGameState] = useState<GameState>(
+    () => new GameState(GameMode.NORMAL, engine.initializeBoard())
   );
 
-  const handleUndoMove = useCallback(() => {
-    if (!engine || gameState.moveCount === 0) return false;
+  const handleMoveBlock = (blockId: string, direction: Direction) => {
+    if (gameState.isWin) return false;
+
+    const newGameState = engine.move(gameState, blockId, direction);
+    if (!newGameState) return false;
+
+    setGameState(newGameState);
+    return true;
+  };
+
+  const handleUndoMove = () => {
+    if (gameState.moveCount === 0) return;
 
     const newGameState = engine.undoMove(gameState);
     setGameState(newGameState);
-    return true;
-  }, [engine, gameState]);
+  };
 
-  const handleResetLevel = useCallback(() => {
-    if (!engine) return false;
+  const handleResetLevel = () => {
+    setGameState(() => engine.resetLevel(gameState));
+  };
 
-    const gameState = engine.resetLevel();
-    setGameState(gameState);
-    return true;
-  }, [engine]);
+  if (!gameState) {
+    const emptyBoard = new Board();
+    return {
+      gameState: new GameState(GameMode.NORMAL, emptyBoard),
+      handleMoveBlock,
+      handleResetLevel,
+      handleUndoMove,
+    };
+  }
 
   return {
     gameState,

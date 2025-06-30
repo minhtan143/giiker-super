@@ -7,7 +7,6 @@ export enum BlockType {
 
 export enum GameMode {
   NORMAL = "NORMAL",
-  LEARN = "LEARN",
   CHALLENGE = "CHALLENGE",
 }
 

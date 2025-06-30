@@ -1,24 +1,13 @@
 import { Block } from "../types/Block";
 import { Board } from "../types/Board";
-import { BlockType, Direction, GameMode } from "../types/Common";
+import { BlockType, Direction } from "../types/Common";
 import { GameState } from "../types/GameState";
 import { Position } from "../types/Position";
+import { getRandomInt } from "../utils/randomInt";
+import { shuffle } from "../utils/shuffle";
 
 export class PuzzleEngine {
   constructor() {}
-
-  initializeLevel(): Board {
-    const board = new Board();
-
-    board.addBlock(
-      new Block(BlockType.BIG_SQUARE, new Position(0, 0), {
-        width: 2,
-        height: 2,
-      })
-    );
-
-    return board;
-  }
 
   move(gameState: GameState, blockId: string, direction: Direction) {
     if (gameState.isWin) return false;
@@ -59,8 +48,64 @@ export class PuzzleEngine {
     return newGameState;
   }
 
-  resetLevel(): GameState {
-    return new GameState(GameMode.NORMAL, this.initializeLevel());
+  resetLevel(gameState: GameState): GameState {
+    return new GameState(gameState.gameMode, this.initializeBoard());
+  }
+
+  initializeBoard(): Board {
+    const board = new Board();
+
+    const rectHorRectCount = getRandomInt(6);
+    const blocks: Block[] = [
+      // new Block(BlockType.BIG_SQUARE),
+      ...Array(rectHorRectCount)
+        .fill(null)
+        .map(() => new Block(BlockType.HORIZONTAL_RECT)),
+      ...Array(5 - rectHorRectCount)
+        .fill(null)
+        .map(() => new Block(BlockType.VERTICAL_RECT)),
+      ...Array(4)
+        .fill(null)
+        .map(() => new Block(BlockType.SMALL_SQUARE)),
+    ];
+
+    do {
+      board.clear();
+      board.addBlock(new Block(BlockType.BIG_SQUARE, new Position(1, 3)));
+
+      this.randomizeBoard(board, blocks);
+      board.shuffle();
+    } while (this.isGameWon(board));
+
+    return board;
+  }
+
+  private randomizeBoard(
+    board: Board,
+    blocks: Block[],
+    currentBlockIndex: number = 0
+  ): boolean {
+    if (currentBlockIndex >= blocks.length) return true;
+    const currentBlock = blocks[currentBlockIndex];
+
+    const availablePositions = shuffle(
+      board.getAvailablePositions(currentBlock)
+    );
+
+    while (availablePositions.length > 0) {
+      currentBlock.position = availablePositions[0];
+      availablePositions.shift();
+
+      if (board.addBlock(currentBlock)) {
+        if (this.randomizeBoard(board, blocks, currentBlockIndex + 1)) {
+          return true;
+        }
+
+        board.removeBlock(currentBlock.id);
+      }
+    }
+
+    return false;
   }
 
   private isGameWon(board: Board): boolean {

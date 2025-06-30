@@ -1,4 +1,5 @@
-import type { Block } from "./Block";
+import { getRandomInt } from "../utils/randomInt";
+import { Block } from "./Block";
 import { Direction, type Size } from "./Common";
 import { Position } from "./Position";
 
@@ -52,6 +53,30 @@ export class Board {
     return true;
   }
 
+  removeBlock(blockId: string): boolean {
+    const blockIndex = this.blocks.findIndex((block) => block.id === blockId);
+    if (blockIndex === -1) return false;
+
+    this.blocks.splice(blockIndex, 1);
+    return true;
+  }
+
+  getAvailablePositions(block: Block): Position[] {
+    const positions: Position[] = [];
+
+    for (let x = 0; x < this.size.width; x++) {
+      for (let y = 0; y < this.size.height; y++) {
+        const position = new Position(x, y);
+        const tempBlock = new Block(block.type, position);
+
+        if (this.isValidPosition(tempBlock)) {
+          positions.push(position);
+        }
+      }
+    }
+    return positions;
+  }
+
   getBlockByPosition(position: Position): Block | null {
     return (
       this.blocks.find(
@@ -95,5 +120,33 @@ export class Board {
 
     block.position = newPosition;
     return true;
+  }
+
+  shuffle(seed: number = 50000): void {
+    const directions = [
+      Direction.UP,
+      Direction.RIGHT,
+      Direction.DOWN,
+      Direction.LEFT,
+    ];
+
+    while (seed > 0) {
+      const blockIndex = getRandomInt(this.blocks.length);
+      const directionIndex = getRandomInt(4);
+
+      for (let i = directionIndex; i < directionIndex + 4; i++) {
+        const moved = this.move(this.blocks[blockIndex].id, directions[i % 4]);
+        if (moved) {
+          seed--;
+          break;
+        }
+      }
+    }
+  }
+
+  clear(): void {
+    this.blocks = [];
+    this.exitPosition = Board.DEFAULT_EXIT_POSITION;
+    this.size = Board.DEFAULT_SIZE;
   }
 }

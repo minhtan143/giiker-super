@@ -1,5 +1,5 @@
-import type { Board } from "./Board";
-import type { GameMode, History } from "./Common";
+import { Board } from "./Board";
+import { GameMode, type History } from "./Common";
 
 export class GameState {
   moveCount: number;
@@ -9,7 +9,10 @@ export class GameState {
   isWin: boolean;
   board: Board;
 
-  constructor(gameMode: GameMode, board: Board) {
+  constructor(
+    gameMode: GameMode = GameMode.NORMAL,
+    board: Board = new Board()
+  ) {
     this.moveCount = 0;
     this.gameMode = gameMode;
     this.startTime = Date.now();
